@@ -1,0 +1,233 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-njiwa" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    {% if error_status_clash %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_status_clash }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tab-connection" data-toggle="tab">{{ tab_connection }}</a></li>
+          <li><a href="#tab-customer" data-toggle="tab">{{ tab_customer }}</a></li>
+          <li><a href="#tab-alert" data-toggle="tab">{{ tab_alert }}</a></li>
+        </ul>
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-njiwa" class="form-horizontal">
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-connection">
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-njiwa-status">{{ entry_status }}</label>
+                <div class="col-sm-10">
+                  <select name="module_njiwa_status" id="input-njiwa-status" class="form-control">
+                    {% if module_njiwa_status %}
+                    <option value="1" selected="selected">{{ text_enabled }}</option>
+                    <option value="0">{{ text_disabled }}</option>
+                    {% else %}
+                    <option value="1">{{ text_enabled }}</option>
+                    <option value="0" selected="selected">{{ text_disabled }}</option>
+                    {% endif %}
+                  </select>
+                  <div class="help-block">{{ help_status }}</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-njiwa-key">{{ entry_api_key }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_njiwa_api_key" value="{{ module_njiwa_api_key|escape }}" placeholder="sk_test_..." id="input-njiwa-key" class="form-control" autocomplete="off" />
+                  <div class="help-block">{{ help_api_key }}</div>
+                </div>
+              </div>
+              <div class="form-group{% if error_url %} has-error{% endif %}">
+                <label class="col-sm-2 control-label" for="input-njiwa-url">{{ entry_url }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_njiwa_url" value="{{ module_njiwa_url|escape }}" id="input-njiwa-url" class="form-control" />
+                  {% if error_url %}<div class="text-danger">{{ error_url }}</div>{% endif %}
+                  <div class="help-block">{{ help_url }}</div>
+                </div>
+              </div>
+              <div class="form-group{% if error_from %} has-error{% endif %}">
+                <label class="col-sm-2 control-label" for="input-njiwa-from">{{ entry_from }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_njiwa_from" value="{{ module_njiwa_from|escape }}" placeholder="254712345678" id="input-njiwa-from" class="form-control" />
+                  {% if error_from %}<div class="text-danger">{{ error_from }}</div>{% endif %}
+                  <div class="help-block">{{ help_from }}</div>
+                </div>
+              </div>
+              <div class="form-group{% if error_country_code %} has-error{% endif %}">
+                <label class="col-sm-2 control-label" for="input-njiwa-country">{{ entry_country_code }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_njiwa_country_code" value="{{ module_njiwa_country_code|escape }}" placeholder="254" id="input-njiwa-country" class="form-control" />
+                  {% if error_country_code %}<div class="text-danger">{{ error_country_code }}</div>{% endif %}
+                  <div class="help-block">{{ help_country_code }}</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-njiwa-mode">{{ entry_send_mode }}</label>
+                <div class="col-sm-10">
+                  <select name="module_njiwa_send_mode" id="input-njiwa-mode" class="form-control">
+                    {% if module_njiwa_send_mode == 'cron' %}
+                    <option value="response">{{ text_send_response }}</option>
+                    <option value="cron" selected="selected">{{ text_send_cron }}</option>
+                    {% else %}
+                    <option value="response" selected="selected">{{ text_send_response }}</option>
+                    <option value="cron">{{ text_send_cron }}</option>
+                    {% endif %}
+                  </select>
+                  <div class="help-block">{{ help_send_mode }}</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ text_state }}</label>
+                <div class="col-sm-10">
+                  <button type="button" id="button-njiwa-test" class="btn btn-default">{{ button_test }}</button>
+                  <button type="button" id="button-njiwa-send" class="btn btn-default">{{ button_send_test }}</button>
+                  <div class="help-block">{{ text_saved_only }}</div>
+                  <div id="njiwa-result"></div>
+                  <div class="well well-sm">
+                    {% if event_registered %}{{ text_event_registered }}{% else %}{{ text_event_missing }}{% endif %}
+                    {% if not table_exists %}<br />{{ text_table_missing }}{% endif %}
+                    <br />{{ text_waiting }}
+                    {% if cron_url %}
+                    <br /><br />{{ text_cron_url }}
+                    <br /><code>{{ cron_url|escape }}</code>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane" id="tab-customer">
+              <div class="well well-sm">
+                {{ text_placeholders }}
+                <ul class="list-unstyled" style="margin-top:8px">
+                  {% for placeholder in placeholders %}
+                  <li><code>{{ placeholder.token }}</code> &mdash; {{ placeholder.meaning }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% for event in events %}
+              <fieldset>
+                <legend>{{ event.name }}</legend>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">{{ entry_event }}</label>
+                  <div class="col-sm-10">
+                    <input type="hidden" name="module_njiwa_event_{{ event.key }}" value="0" />
+                    <label class="checkbox-inline">
+                      <input type="checkbox" name="module_njiwa_event_{{ event.key }}" value="1"{% if event.enabled %} checked="checked"{% endif %} /> {{ event.name }}
+                    </label>
+                    <div class="help-block">{{ event.about }}</div>
+                  </div>
+                </div>
+                <div class="form-group{% if event.error %} has-error{% endif %}">
+                  <label class="col-sm-2 control-label">{{ entry_order_status }}</label>
+                  <div class="col-sm-10">
+                    <select name="module_njiwa_status_{{ event.key }}" class="form-control">
+                      <option value="0">{{ text_choose_status }}</option>
+                      {% for order_status in order_statuses %}
+                      <option value="{{ order_status.order_status_id }}"{% if order_status.order_status_id == event.order_status_id %} selected="selected"{% endif %}>{{ order_status.name }}</option>
+                      {% endfor %}
+                    </select>
+                    {% if event.error %}<div class="text-danger">{{ event.error }}</div>{% endif %}
+                    <div class="help-block">{{ help_order_status }}</div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">{{ entry_template }}</label>
+                  <div class="col-sm-10">
+                    <textarea name="module_njiwa_template_{{ event.key }}" rows="5" class="form-control">{{ event.template|escape }}</textarea>
+                    <div class="help-block">{{ help_template }}</div>
+                  </div>
+                </div>
+              </fieldset>
+              {% endfor %}
+            </div>
+            <div class="tab-pane" id="tab-alert">
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_alert }}</label>
+                <div class="col-sm-10">
+                  <input type="hidden" name="module_njiwa_event_alert" value="0" />
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="module_njiwa_event_alert" value="1"{% if module_njiwa_event_alert %} checked="checked"{% endif %} /> {{ entry_alert }}
+                  </label>
+                  <div class="help-block">{{ help_alert }}</div>
+                </div>
+              </div>
+              <div class="form-group{% if error_alert_numbers %} has-error{% endif %}">
+                <label class="col-sm-2 control-label" for="input-njiwa-numbers">{{ entry_alert_numbers }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="module_njiwa_alert_numbers" value="{{ module_njiwa_alert_numbers|escape }}" placeholder="254712345678, 254733000111" id="input-njiwa-numbers" class="form-control" />
+                  {% if error_alert_numbers %}<div class="text-danger">{{ error_alert_numbers }}</div>{% endif %}
+                  <div class="help-block">{{ help_alert_numbers }}</div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_template }}</label>
+                <div class="col-sm-10">
+                  <textarea name="module_njiwa_template_alert" rows="5" class="form-control">{{ module_njiwa_template_alert|escape }}</textarea>
+                  <div class="help-block">{{ help_template_alert }} {{ help_template }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+function njiwaAsk(url, method, button) {
+	var result = $('#njiwa-result');
+
+	button.prop('disabled', true);
+	result.html('<div class="alert alert-info">{{ text_asking }}</div>');
+
+	$.ajax({
+		url: url,
+		type: method,
+		dataType: 'json',
+		success: function (json) {
+			if (json['error']) {
+				result.html('<div class="alert alert-danger">' + json['error'] + '</div>');
+			} else {
+				result.html('<div class="alert alert-success">' + json['success'] + '</div>');
+			}
+		},
+		error: function (xhr) {
+			result.html('<div class="alert alert-danger">' + xhr.status + ' ' + xhr.statusText + '</div>');
+		},
+		complete: function () {
+			button.prop('disabled', false);
+		}
+	});
+}
+
+$('#button-njiwa-test').on('click', function () {
+	njiwaAsk('index.php?route=extension/module/njiwa/test&user_token={{ user_token }}', 'GET', $(this));
+});
+
+$('#button-njiwa-send').on('click', function () {
+	njiwaAsk('index.php?route=extension/module/njiwa/send&user_token={{ user_token }}', 'POST', $(this));
+});
+//--></script>
+{{ footer }}
